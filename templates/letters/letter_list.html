@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Letters | FutureMail{% endblock %}
+
+{% block content %}
+<div class="header-section"
+    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <h1 style="font-size: 2.5rem; font-weight: 800; color: #111827;">Your Scheduled Letters</h1>
+        <p style="color: var(--text-muted);">Manage and track your letters to the future.</p>
+    </div>
+    <a href="{% url 'letters:create' %}" class="btn btn-primary">+ Schedule New Letter</a>
+</div>
+
+{% if letters %}
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+    {% for letter in letters %}
+    <div class="glass-card" style="padding: 1.5rem; position: relative; overflow: hidden;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+            <span
+                style="background: rgba(255, 212, 29, 0.2); color: var(--primary); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700;">
+                {% if letter.is_sent %}SCHEDULED{% else %}DRAFT{% endif %}
+            </span>
+            <span style="color: var(--text-muted); font-size: 0.875rem;">{{ letter.delivery_date|date:"M d, Y" }}</span>
+        </div>
+        <h3 style="margin-bottom: 0.5rem; font-weight: 700;">To: {{ letter.receiver_fullname }}</h3>
+        <p
+            style="color: var(--text-muted); font-size: 0.875rem; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 1rem;">
+            {{ letter.content }}
+        </p>
+        {% if letter.image %}
+        <div style="margin-top: 1rem; border-radius: 12px; overflow: hidden; height: 150px;">
+            <img src="{{ letter.image.url }}" alt="Letter image" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        {% endif %}
+        <div
+            style="margin-top: 1rem; border-top: 1px solid var(--glass-border); padding-top: 1rem; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.75rem; color: var(--text-muted);">From: {{ letter.sender_fullname }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="glass-card text-center" style="padding: 5rem 2rem;">
+    <div style="font-size: 4rem; margin-bottom: 1rem;">✉️</div>
+    <h2 style="font-weight: 700; margin-bottom: 0.5rem;">No letters scheduled yet</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">Why not send some love to your future self or a friend?
+    </p>
+    <a href="{% url 'letters:create' %}" class="btn btn-primary">Create Your First Letter</a>
+</div>
+{% endif %}
+{% endblock %}

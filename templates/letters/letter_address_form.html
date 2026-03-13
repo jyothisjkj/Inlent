@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Address Details | FutureMail{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; margin-bottom: 2rem;">
+    <div class="glass-card" style="width: 100%; max-width: 900px;">
+        <div class="mb-4 text-center">
+            <h1 style="font-size: 2rem; font-weight: 800; color: #111827;">Address Details</h1>
+            <!-- <p class="text-muted">Step 1: Where is this letter coming from, and where is it going?</p> -->
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-error">
+                {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                <!-- SENDER SECTION -->
+                <div style="flex: 1; min-width: 300px;">
+                    <h3 style="margin-bottom: 1rem; color: var(--primary);">From (Sender)</h3>
+
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        {{ form.sender_fullname }}
+                    </div>
+                    <div class="form-group">
+                        <label>Nick Name (Optional)</label>
+                        {{ form.sender_nickname }}
+                    </div>
+                    <div class="form-group">
+                        <label>Place / Address Line 1</label>
+                        {{ form.sender_place }}
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>City</label>
+                            {{ form.sender_city }}
+                        </div>
+                        <div class="form-group">
+                            <label>State</label>
+                            {{ form.sender_state }}
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Country</label>
+                            {{ form.sender_country }}
+                        </div>
+                        <div class="form-group">
+                            <label>Pincode</label>
+                            {{ form.sender_pincode }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RECEIVER SECTION -->
+                <div style="flex: 1; min-width: 300px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="color: var(--primary);">To (Receiver)</h3>
+                        <label
+                            style="display: flex; align-items: center; cursor: pointer; color: var(--primary); font-size: 0.9rem; font-weight: 600;">
+                            <input type="checkbox" name="send_to_self" id="id_send_to_self"
+                                style="margin-right: 0.5rem; accent-color: var(--primary);"> Send to Self
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        {{ form.receiver_fullname }}
+                    </div>
+                    <div class="form-group">
+                        <label>Nick Name (Optional)</label>
+                        {{ form.receiver_nickname }}
+                    </div>
+                    <div class="form-group">
+                        <label>Place / Address Line 1</label>
+                        {{ form.receiver_place }}
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>City</label>
+                            {{ form.receiver_city }}
+                        </div>
+                        <div class="form-group">
+                            <label>State</label>
+                            {{ form.receiver_state }}
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Country</label>
+                            {{ form.receiver_country }}
+                        </div>
+                        <div class="form-group">
+                            <label>Pincode</label>
+                            {{ form.receiver_pincode }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; font-size: 1.1rem; padding: 1rem;">Next Step: Letter Content</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selfToggle = document.getElementById('id_send_to_self');
+
+        // Sender fields
+        const s_full = document.getElementById('id_sender_fullname');
+        const s_nick = document.getElementById('id_sender_nickname');
+        const s_place = document.getElementById('id_sender_place');
+        const s_city = document.getElementById('id_sender_city');
+        const s_state = document.getElementById('id_sender_state');
+        const s_country = document.getElementById('id_sender_country');
+        const s_pin = document.getElementById('id_sender_pincode');
+
+        // Receiver fields
+        const r_full = document.getElementById('id_receiver_fullname');
+        const r_nick = document.getElementById('id_receiver_nickname');
+        const r_place = document.getElementById('id_receiver_place');
+        const r_city = document.getElementById('id_receiver_city');
+        const r_state = document.getElementById('id_receiver_state');
+        const r_country = document.getElementById('id_receiver_country');
+        const r_pin = document.getElementById('id_receiver_pincode');
+
+        const receiver_fields = [r_full, r_nick, r_place, r_city, r_state, r_pin];
+
+        if (selfToggle) {
+            selfToggle.addEventListener('change', function () {
+                if (this.checked) {
+                    r_full.value = s_full.value;
+                    r_nick.value = s_nick.value;
+                    r_place.value = s_place.value;
+                    r_city.value = s_city.value;
+                    r_state.value = s_state.value;
+                    r_country.value = s_country.value;
+                    r_pin.value = s_pin.value;
+
+                    receiver_fields.forEach(f => {
+                        f.readOnly = true;
+                        f.style.opacity = '0.6';
+                    });
+                } else {
+                    receiver_fields.forEach(f => {
+                        f.readOnly = false;
+                        f.style.opacity = '1';
+                    });
+                }
+            });
+
+            // Update dynamically if checkbox is checked while typing
+            const sender_fields_map = [
+                [s_full, r_full], [s_nick, r_nick], [s_place, r_place],
+                [s_city, r_city], [s_state, r_state], [s_pin, r_pin]
+            ];
+
+            sender_fields_map.forEach(pair => {
+                pair[0].addEventListener('input', function () {
+                    if (selfToggle.checked) {
+                        pair[1].value = this.value;
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}
