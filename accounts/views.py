@@ -1,6 +1,6 @@
 from django.views import View
 from django.views.generic import TemplateView
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import redirect, render
 from accounts.models import CustomUser
 
